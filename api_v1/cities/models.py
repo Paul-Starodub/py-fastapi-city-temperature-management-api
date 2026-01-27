@@ -1,9 +1,9 @@
 from typing import TYPE_CHECKING
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from src.models import Base
+from api_v1.models import Base
 
 if TYPE_CHECKING:
-    from src.temperatures.models import Temperature
+    from api_v1.temperatures.models import Temperature
 
 
 class City(Base):

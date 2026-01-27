@@ -2,10 +2,10 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from src.models import Base
+from api_v1.models import Base
 
 if TYPE_CHECKING:
-    from src.cities.models import City
+    from api_v1.cities.models import City
 
 
 class Temperature(Base):
