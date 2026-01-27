@@ -10,6 +10,14 @@ class CityCreate(CityBase):
     pass
 
 
+class CityUpdate(CityBase):
+    pass
+
+
+class CityPartialUpdate(CityBase):
+    name: str | None = None
+
+
 class City(CityBase):
     id: int
 

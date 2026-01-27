@@ -1,16 +1,45 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 from api_v1.cities import schemas, crud
 from dependencies import DbSession
 
 
-router = APIRouter()
+router = APIRouter(prefix="/cities", tags=["cities"])
 
 
-@router.get("/cities/", response_model=list[schemas.City])
+@router.get("/", response_model=list[schemas.City])
 async def read_cities(db: DbSession):
     return await crud.city_crud.get_all_cities(db=db)
 
 
-@router.post("/cities/", response_model=schemas.City)
+@router.get("/{city_id}", response_model=schemas.City)
+async def read_city(db: DbSession, city_id: int):
+    city = await crud.city_crud.get_city_by_id(db=db, city_id=city_id)
+    if city is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City not found")
+    return city
+
+
+@router.post("/", response_model=schemas.City)
 async def create_city(db: DbSession, city: schemas.CityCreate):
-    return await crud.city_crud.create_city(db=db, city=city)
+    return await crud.city_crud.create_city(db=db, city_in=city)
+
+
+@router.put("/{city_id}", response_model=schemas.City)
+async def update_city(db: DbSession, city_id: int, city: schemas.CityUpdate):
+    updated = await crud.city_crud.update_city(db=db, city_id=city_id, city_update=city)
+    if updated is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City not found")
+    return updated
+
+
+@router.patch("/{city_id}", response_model=schemas.City)
+async def patch_city(db: DbSession, city_id: int, city: schemas.CityPartialUpdate):
+    updated = await crud.city_crud.patch_city(db=db, city_id=city_id, city_patch=city)
+    if updated is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City not found")
+    return updated
+
+
+@router.delete("/{city_id}", response_model=schemas.City | None)
+async def delete_city(db: DbSession, city_id: int):
+    return await crud.city_crud.delete_city(db=db, city_id=city_id)
