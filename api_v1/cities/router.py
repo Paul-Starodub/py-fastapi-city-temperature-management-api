@@ -21,7 +21,7 @@ async def read_city(db: DbSession, city_id: int):
 
 @router.post("/", response_model=schemas.City)
 async def create_city(db: DbSession, city: schemas.CityCreate):
-    return await crud.city_crud.create_city(db=db, city_in=city)
+    return await crud.city_crud.create_city(db=db, city_create=city)
 
 
 @router.put("/{city_id}", response_model=schemas.City)
