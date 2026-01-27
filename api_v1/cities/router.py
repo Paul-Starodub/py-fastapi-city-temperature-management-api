@@ -21,12 +21,24 @@ async def read_city(db: DbSession, city_id: int):
 
 @router.post("/", response_model=schemas.City)
 async def create_city(db: DbSession, city: schemas.CityCreate):
-    return await crud.city_crud.create_city(db=db, city_create=city)
+    try:
+        return await crud.city_crud.create_city(db=db, city_create=city)
+    except crud.CityNameConflict as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=str(exc)
+        ) from exc
 
 
 @router.put("/{city_id}", response_model=schemas.City)
 async def update_city(db: DbSession, city_id: int, city: schemas.CityUpdate):
-    updated = await crud.city_crud.update_city(db=db, city_id=city_id, city_update=city)
+    try:
+        updated = await crud.city_crud.update_city(
+            db=db, city_id=city_id, city_update=city
+        )
+    except crud.CityNameConflict as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=str(exc)
+        ) from exc
     if updated is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City not found")
     return updated
@@ -34,7 +46,14 @@ async def update_city(db: DbSession, city_id: int, city: schemas.CityUpdate):
 
 @router.patch("/{city_id}", response_model=schemas.City)
 async def patch_city(db: DbSession, city_id: int, city: schemas.CityPartialUpdate):
-    updated = await crud.city_crud.patch_city(db=db, city_id=city_id, city_patch=city)
+    try:
+        updated = await crud.city_crud.patch_city(
+            db=db, city_id=city_id, city_patch=city
+        )
+    except crud.CityNameConflict as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=str(exc)
+        ) from exc
     if updated is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City not found")
     return updated

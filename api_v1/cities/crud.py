@@ -1,8 +1,8 @@
-from fastapi import HTTPException, status
 from sqlalchemy import select, Result
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from api_v1.cities import models, schemas
+from api_v1.cities.exeptions import CityNameConflict
 
 
 class CityCRUD:
@@ -12,7 +12,7 @@ class CityCRUD:
             select(models.City).where(models.City.name == name).where(models.City.id != city_id)
         )
         if existing_city:
-            raise HTTPException(status.HTTP_409_CONFLICT, "City name must be unique")
+            raise CityNameConflict()
 
     @staticmethod
     async def get_all_cities(db: AsyncSession, skip: int = 0, limit: int = 10) -> list[models.City]:
@@ -33,10 +33,7 @@ class CityCRUD:
             await db.commit()
         except IntegrityError:
             await db.rollback()
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="City with this name already exists",
-            )
+            raise CityNameConflict()
         await db.refresh(city)
         return city
 
@@ -52,7 +49,7 @@ class CityCRUD:
             await db.commit()
         except IntegrityError:
             await db.rollback()
-            raise HTTPException(status.HTTP_409_CONFLICT, "City name must be unique")
+            raise CityNameConflict()
         return city
 
     @staticmethod
@@ -69,7 +66,7 @@ class CityCRUD:
             await db.commit()
         except IntegrityError:
             await db.rollback()
-            raise HTTPException(status.HTTP_409_CONFLICT, "City name must be unique")
+            raise CityNameConflict()
         return city
 
     @staticmethod
