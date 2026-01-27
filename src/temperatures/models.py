@@ -9,8 +9,6 @@ if TYPE_CHECKING:
 
 
 class Temperature(Base):
-    __tablename__ = "temperatures"
-
     city_id: Mapped[int] = mapped_column(ForeignKey("cities.id"))
     date_time: Mapped[datetime]
     temperature: Mapped[float]
