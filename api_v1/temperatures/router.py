@@ -3,10 +3,10 @@ from api_v1.temperatures import schemas, crud
 from api_v1.dependencies import DbSession, Skip, Limit, CityIdOptional
 
 
-router = APIRouter()
+router = APIRouter(tags=["temperatures"], prefix="/temperatures")
 
 
-@router.get("/temperatures/", response_model=list[schemas.Temperature])
+@router.get("/", response_model=list[schemas.Temperature])
 async def read_temperatures(
     db: DbSession, skip: Skip = 0, limit: Limit = 100, city_id: CityIdOptional = None
 ):
@@ -15,7 +15,7 @@ async def read_temperatures(
     )
 
 
-@router.post("/temperatures/update/", response_model=schemas.TemperatureUpdateResult)
+@router.post("/update/", response_model=schemas.TemperatureUpdateResult)
 async def update_temperatures(db: DbSession):
     updated, failed = await crud.temperature_crud.update_all_city_temperatures(db=db)
     return schemas.TemperatureUpdateResult(updated=updated, failed=failed)
