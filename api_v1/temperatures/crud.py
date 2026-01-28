@@ -10,9 +10,7 @@ from api_v1.temperatures import models as temperature_models
 
 class TemperatureCRUD:
     @staticmethod
-    async def _fetch_current_temperature(
-        client: AsyncClient, city_name: str
-    ) -> tuple[datetime, float]:
+    async def _fetch_current_temperature(client: AsyncClient, city_name: str) -> tuple[datetime, float]:
         geocode_resp = await client.get(
             "https://geocoding-api.open-meteo.com/v1/search",
             params={
@@ -47,6 +45,20 @@ class TemperatureCRUD:
         return datetime.fromisoformat(current["time"]), float(current["temperature_2m"])
 
     @staticmethod
+    async def _build_temperature_record(
+        db: AsyncSession, client: AsyncClient, city: city_models.City
+    ) -> temperature_models.Temperature:
+        observed_at, temperature = await TemperatureCRUD._fetch_current_temperature(client, city.name)
+        record = temperature_models.Temperature(
+            city_id=city.id,
+            date_time=observed_at,
+            temperature=temperature,
+        )
+        record.city = city
+        db.add(record)
+        return record
+
+    @staticmethod
     async def get_all_temperatures(
         db: AsyncSession, skip: int = 0, limit: int = 10
     ) -> list[temperature_models.Temperature]:
@@ -70,21 +82,10 @@ class TemperatureCRUD:
         async with AsyncClient(timeout=10) as client:
             for city in cities:
                 try:
-                    observed_at, temperature = (
-                        await TemperatureCRUD._fetch_current_temperature(
-                            client, city.name
-                        )
-                    )
+                    record = await TemperatureCRUD._build_temperature_record(db, client, city)
                 except (HTTPError, ValueError) as exc:
                     failed[city.name] = str(exc)
                     continue
-                record = temperature_models.Temperature(
-                    city_id=city.id,
-                    date_time=observed_at,
-                    temperature=temperature,
-                )
-                record.city = city
-                db.add(record)
                 updated.append(record)
         if updated:
             try:
