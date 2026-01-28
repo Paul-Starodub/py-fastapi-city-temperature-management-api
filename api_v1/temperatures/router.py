@@ -1,15 +1,17 @@
 from fastapi import APIRouter
 from api_v1.temperatures import schemas, crud
-from api_v1.dependencies import DbSession, Skip, Limit
+from api_v1.dependencies import DbSession, Skip, Limit, CityIdOptional
 
 
 router = APIRouter()
 
 
 @router.get("/temperatures/", response_model=list[schemas.Temperature])
-async def read_temperatures(db: DbSession, skip: Skip = 0, limit: Limit = 100):
+async def read_temperatures(
+    db: DbSession, skip: Skip = 0, limit: Limit = 100, city_id: CityIdOptional = None
+):
     return await crud.temperature_crud.get_all_temperatures(
-        db=db, skip=skip, limit=limit
+        db=db, skip=skip, limit=limit, city_id=city_id
     )
 
 

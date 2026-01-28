@@ -96,14 +96,14 @@ class TemperatureCRUD:
 
     @staticmethod
     async def get_all_temperatures(
-        db: AsyncSession, skip: int = 0, limit: int = 100
+        db: AsyncSession, skip: int = 0, limit: int = 100, city_id: int | None = None
     ) -> list[temperature_models.Temperature]:
-        stmt = (
-            select(temperature_models.Temperature)
-            .options(selectinload(temperature_models.Temperature.city))
-            .offset(skip)
-            .limit(limit)
+        stmt = select(temperature_models.Temperature).options(
+            selectinload(temperature_models.Temperature.city)
         )
+        if city_id is not None:
+            stmt = stmt.where(temperature_models.Temperature.city_id == city_id)
+        stmt = stmt.offset(skip).limit(limit)
         result: AsyncResult = await db.execute(stmt)
         return result.scalars().all()
 
