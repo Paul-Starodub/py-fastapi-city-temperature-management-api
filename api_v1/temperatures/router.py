@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from api_v1.temperatures import schemas, crud
-from dependencies import DbSession
+from api_v1.dependencies import DbSession
 
 
 router = APIRouter()

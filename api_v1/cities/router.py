@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 from api_v1.cities import schemas, crud
-from dependencies import DbSession
+from api_v1.dependencies import DbSession
 
 
 router = APIRouter(prefix="/cities", tags=["cities"])
