@@ -7,15 +7,17 @@ router = APIRouter(prefix="/cities", tags=["cities"])
 
 
 @router.get("/", response_model=list[schemas.City])
-async def read_cities(db: DbSession):
-    return await crud.city_crud.get_all_cities(db=db)
+async def read_cities(db: DbSession, skip: int = 0, limit: int = 10):
+    return await crud.city_crud.get_all_cities(db=db, skip=skip, limit=limit)
 
 
 @router.get("/{city_id}", response_model=schemas.City)
 async def read_city(db: DbSession, city_id: int):
     city = await crud.city_crud.get_city_by_id(db=db, city_id=city_id)
     if city is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="City not found"
+        )
     return city
 
 
@@ -40,7 +42,9 @@ async def update_city(db: DbSession, city_id: int, city: schemas.CityUpdate):
             status_code=status.HTTP_409_CONFLICT, detail=str(exc)
         ) from exc
     if updated is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="City not found"
+        )
     return updated
 
 
@@ -55,7 +59,9 @@ async def patch_city(db: DbSession, city_id: int, city: schemas.CityPartialUpdat
             status_code=status.HTTP_409_CONFLICT, detail=str(exc)
         ) from exc
     if updated is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="City not found"
+        )
     return updated
 
 
