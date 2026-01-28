@@ -5,28 +5,18 @@ FastAPI service for managing cities and storing current temperature snapshots fo
 ### Requirements
 
 - Python 3.12+
-- Postgres (local or via Docker)
+- SQLite (local file)
 
 ### Configuration
 
-Create `.env` in the project root (already present in this repo):
+Create `.env` in the project root (optional). Default is SQLite:
 
 ```
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=city_db
-DB_USER=postgres
-DB_PASSWORD=postgres
-ECHO=True
+DATABASE_URL=sqlite+aiosqlite:///./test.db
+ECHO=False
 ```
 
 ### Database
-
-Start Postgres with Docker:
-
-```
-docker compose up -d
-```
 
 Run migrations:
 
@@ -94,6 +84,6 @@ Temperature data is fetched from Open-Meteo (no API key required):
 
 ### Design choices and assumptions
 
-- Postgres is used instead of SQLite.
+- SQLite is used for local development.
 - Temperature updates append new history records (duplicates are possible if data does not change).
 - Uniqueness of city names is enforced at the database level and converted to `409 Conflict` in the API.

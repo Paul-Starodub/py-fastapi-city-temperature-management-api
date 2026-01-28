@@ -67,4 +67,9 @@ async def patch_city(db: DbSession, city_id: int, city: schemas.CityPartialUpdat
 
 @router.delete("/{city_id}", response_model=schemas.City | None)
 async def delete_city(db: DbSession, city_id: int):
-    return await crud.city_crud.delete_city(db=db, city_id=city_id)
+    deleted = await crud.city_crud.delete_city(db=db, city_id=city_id)
+    if deleted is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="City not found"
+        )
+    return deleted

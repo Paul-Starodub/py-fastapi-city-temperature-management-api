@@ -2,7 +2,7 @@ from sqlalchemy import select, Result
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from api_v1.cities import models, schemas
-from api_v1.cities.exeptions import CityNameConflict
+from api_v1.cities.exceptions import CityNameConflict
 
 
 class CityCRUD:
