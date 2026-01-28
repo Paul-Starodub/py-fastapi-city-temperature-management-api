@@ -1,13 +1,13 @@
 from fastapi import APIRouter, HTTPException, status
 from api_v1.cities import schemas, crud
-from api_v1.dependencies import DbSession
+from api_v1.dependencies import DbSession, Skip, Limit
 
 
 router = APIRouter(prefix="/cities", tags=["cities"])
 
 
 @router.get("/", response_model=list[schemas.City])
-async def read_cities(db: DbSession, skip: int = 0, limit: int = 10):
+async def read_cities(db: DbSession, skip: Skip = 0, limit: Limit = 100):
     return await crud.city_crud.get_all_cities(db=db, skip=skip, limit=limit)
 
 
